@@ -28,7 +28,7 @@ if ( ! defined('BASEPATH'))
 class Shorteen {
 
     var $return_data	= ''; 						// Bah!
-    
+
     var $settings = array();
 
     /** ----------------------------------------
@@ -36,22 +36,22 @@ class Shorteen {
     /** ----------------------------------------*/
 
     function __construct()
-    {        
-    	$this->EE =& get_instance(); 
+    {
+    	$this->EE =& get_instance();
         $query = $this->EE->db->query("SELECT settings FROM exp_modules WHERE module_name='Shorteen' LIMIT 1");
-        $this->settings = unserialize($query->row('settings')); 
+        $this->settings = unserialize($query->row('settings'));
     }
     /* END */
-    
-    
-    
+
+
+
     function process($service='', $url='', $embedded=false)
     {
         if (isset($this->EE->TMPL))
         {
             $service = $this->EE->TMPL->fetch_param('service');
             $url = $this->EE->TMPL->parse_globals($this->EE->TMPL->fetch_param('url'));
-            // Path variable: {path=group/template}		
+            // Path variable: {path=group/template}
 			if (strpos($url, 'path=') !== FALSE)
 			{
 				$url = preg_replace_callback("/".LD."\s*path=(.*?)".RD."/", array(&$this->EE->functions, 'create_url'), $url);
@@ -62,7 +62,7 @@ class Shorteen {
         if ($this->EE->input->get('url')!='') $url = urldecode($this->EE->input->get('url'));
         if ($service=='') $service='googl';
         if ($url=='') return false;
-        
+
         //check whether shorturl is already in DB
         $this->EE->db->select('id, shorturl, created')
                     ->from('shorteen')
@@ -83,7 +83,7 @@ class Shorteen {
                     $this->EE->db->delete('shorteen', array('id'=>$row['id']));
                 }
             }
-            if (isset($shorturl)) 
+            if (isset($shorturl))
             {
                 if (isset($this->EE->TMPL) || $embedded==true)
                 {
@@ -151,16 +151,35 @@ class Shorteen {
                   return urldecode($url);
                 }
                 break;
+            case 'cloud-app':
+                $req_url = 'http://my.cl.ly/items';
+                $req_type = 'POST';
+                $req_ctype = 'json';
+                $data_string = '{"item": { "redirect_url": "' . urldecode($url) . '" } }';
+                $auth_type = 'digest';
+                $credentials = array(
+                  'username' => $this->settings['cloud-app']['email'],
+                  'password' => $this->settings['cloud-app']['password']
+                );
+                break;
         }
         $url = urldecode($url);
 
         $ch = curl_init($req_url);
+        curl_setopt($ch, CURLOPT_USERAGENT, 'Shorteen ExpressionEngine Add-on');
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
         curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
         curl_setopt($ch, CURLOPT_SSLVERSION,3);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_COOKIEFILE, '/dev/null');
+        if ($auth_type=='digest')
+        {
+            curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST);
+            curl_setopt($ch, CURLOPT_USERPWD, $credentials['username'] . ':' . $credentials['password']);
+        }
         if ($req_type=='POST')
         {
             curl_setopt($ch,CURLOPT_POST,true);
@@ -168,7 +187,7 @@ class Shorteen {
         }
         if ($req_ctype == 'json')
         {
-            curl_setopt($ch,CURLOPT_HTTPHEADER, array("Content-Type: application/json"));
+            curl_setopt($ch,CURLOPT_HTTPHEADER, array("Content-Type: application/json", "Accept: application/json"));
         }
 		$response = curl_exec($ch);
         $error = curl_error($ch);
@@ -177,7 +196,7 @@ class Shorteen {
         {
             return $url;
         }
-        
+
         if ($req_ctype == 'json')
         {
             if (function_exists('json_decode'))
@@ -199,13 +218,19 @@ class Shorteen {
             case 'googl':
                 $shorturl = $rawdata->id;
                 break;
+            case 'cloud-app':
+                if (isset($rawdata))
+                {
+                    $shorturl = $rawdata->url;
+                }
+                break;
             default:
                 $shorturl = $response;
                 break;
         }
-        
+
         if ($shorturl == '') $shorturl = $url;
-        
+
         $data = array(
                     'service'=>$service,
                     'url'=>$url,
@@ -213,7 +238,7 @@ class Shorteen {
                     'created'=>$this->EE->localize->now
                     );
         $this->EE->db->insert('shorteen', $data);
-        
+
         if (isset($this->EE->TMPL) || $embedded==true)
         {
             return $shorturl;
