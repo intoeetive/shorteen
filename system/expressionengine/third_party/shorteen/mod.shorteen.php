@@ -28,7 +28,7 @@ if ( ! defined('BASEPATH'))
 class Shorteen {
 
     var $return_data	= ''; 						// Bah!
-    
+
     var $settings = array();
 
     /** ----------------------------------------
@@ -36,22 +36,22 @@ class Shorteen {
     /** ----------------------------------------*/
 
     function __construct()
-    {        
-    	$this->EE =& get_instance(); 
+    {
+    	$this->EE =& get_instance();
         $query = $this->EE->db->query("SELECT settings FROM exp_modules WHERE module_name='Shorteen' LIMIT 1");
-        $this->settings = unserialize($query->row('settings')); 
+        $this->settings = unserialize($query->row('settings'));
     }
     /* END */
-    
-    
-    
+
+
+
     function process($service='', $url='', $embedded=false)
     {
         if (isset($this->EE->TMPL))
         {
             $service = $this->EE->TMPL->fetch_param('service');
             $url = $this->EE->TMPL->parse_globals($this->EE->TMPL->fetch_param('url'));
-            // Path variable: {path=group/template}		
+            // Path variable: {path=group/template}
 			if (strpos($url, 'path=') !== FALSE)
 			{
 				$url = preg_replace_callback("/".LD."\s*path=(.*?)".RD."/", array(&$this->EE->functions, 'create_url'), $url);
@@ -62,7 +62,7 @@ class Shorteen {
         if ($this->EE->input->get('url')!='') $url = urldecode($this->EE->input->get('url'));
         if ($service=='') $service='googl';
         if ($url=='') return false;
-        
+
         //check whether shorturl is already in DB
         $this->EE->db->select('id, shorturl, created')
                     ->from('shorteen')
@@ -83,7 +83,7 @@ class Shorteen {
                     $this->EE->db->delete('shorteen', array('id'=>$row['id']));
                 }
             }
-            if (isset($shorturl)) 
+            if (isset($shorturl))
             {
                 if (isset($this->EE->TMPL) || $embedded==true)
                 {
@@ -177,7 +177,7 @@ class Shorteen {
         {
             return $url;
         }
-        
+
         if ($req_ctype == 'json')
         {
             if (function_exists('json_decode'))
@@ -203,9 +203,9 @@ class Shorteen {
                 $shorturl = $response;
                 break;
         }
-        
+
         if ($shorturl == '') $shorturl = $url;
-        
+
         $data = array(
                     'service'=>$service,
                     'url'=>$url,
@@ -213,7 +213,7 @@ class Shorteen {
                     'created'=>$this->EE->localize->now
                     );
         $this->EE->db->insert('shorteen', $data);
-        
+
         if (isset($this->EE->TMPL) || $embedded==true)
         {
             return $shorturl;
