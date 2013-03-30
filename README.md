@@ -1,13 +1,13 @@
 	<h1>Shorteen</h1>
 
 	<p>Shorteen lets you shorten your URLs using wide range of shortening services - third-party and self-hosted.</p>
-    
+
 
 	<h2><a name="usage"></a>Usage</h2>
-    
+
 <code>
 {exp:shorteen:process service="bitly" url="http://www.ellislab.com"}
-</code>    
+</code>
 <p>Parameters:</p>
 <ul>
 <li><strong>url</strong> &mdash; URL to shorten. If omited, will shorten URL of current page.</li>
@@ -18,16 +18,17 @@
         <li><ins>bitly</ins> &mdash; <a href="http://bitly.com">bit.ly</a> (default)</li>
         <li><ins>yourls</ins> &mdash; <a href="http://yourls.org">YOURLS</a> based service (running on any domain)</li>
         <li><ins>lessn-more</ins> &mdash; <a href="http://lessnmore.net/">Lessn More</a> based service (running on any domain)</li>
+        <li><ins>cloud-app</ins> &mdash; <a href="http://getcloudapp.com/">CloudApp</a> based service (running on any domain)</li>
     </ul>
 </li>
 </ul>
 
 <p>The shortest form of tag would be <em>{exp:shorteen:process}</em> &mdash; shortens URL of current page using goo.gl</p>
 <p>If service is not available or some data are missing in settings, the module will return the 'initial' long URL.</p>
-  
-    
+
+
 	<h2><a name="settings"></a>Settings</h2>
-    
+
 <p>Some shortening services are available openly for everyone, and some require providing API key and/or other data. You need to provide those in module settings.</p>
 
 <h4>goo.gl</h4>

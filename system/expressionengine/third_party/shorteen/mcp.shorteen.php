@@ -47,6 +47,10 @@ class Shorteen_mcp {
                         'lessn-more'=>array(
                             'api_key',
                             'install_url'
+                        ),
+                        'cloud-app'=>array(
+                            'email',
+                            'password'
                         )
                     );
 
@@ -86,10 +90,11 @@ class Shorteen_mcp {
 
             foreach ($provider_fields as $field)
             {
+                $field_type = ($field == 'password' ? 'password' : 'input');
                 $data['fields'][] = array(
-                                        'label'=>lang($field),
-                                        'field'=>form_input($field."[$provider_name]", (isset($this->settings[$provider_name][$field])?$this->settings[$provider_name][$field]:''), 'style="width: 80%"')
-                                    );
+                    'label'=>lang($field),
+                    'field'=>call_user_func('form_' . $field_type, $field."[$provider_name]", (isset($this->settings[$provider_name][$field])?$this->settings[$provider_name][$field]:''), 'style="width: 80%"')
+                );
             }
 
             $providers_view .= $this->EE->load->view('provider', $data, TRUE);

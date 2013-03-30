@@ -151,16 +151,35 @@ class Shorteen {
                   return urldecode($url);
                 }
                 break;
+            case 'cloud-app':
+                $req_url = 'http://my.cl.ly/items';
+                $req_type = 'POST';
+                $req_ctype = 'json';
+                $data_string = '{"item": { "redirect_url": "' . urldecode($url) . '" } }';
+                $auth_type = 'digest';
+                $credentials = array(
+                  'username' => $this->settings['cloud-app']['email'],
+                  'password' => $this->settings['cloud-app']['password']
+                );
+                break;
         }
         $url = urldecode($url);
 
         $ch = curl_init($req_url);
+        curl_setopt($ch, CURLOPT_USERAGENT, 'Shorteen ExpressionEngine Add-on');
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
         curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
         curl_setopt($ch, CURLOPT_SSLVERSION,3);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_COOKIEFILE, '/dev/null');
+        if ($auth_type=='digest')
+        {
+            curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST);
+            curl_setopt($ch, CURLOPT_USERPWD, $credentials['username'] . ':' . $credentials['password']);
+        }
         if ($req_type=='POST')
         {
             curl_setopt($ch,CURLOPT_POST,true);
@@ -168,7 +187,7 @@ class Shorteen {
         }
         if ($req_ctype == 'json')
         {
-            curl_setopt($ch,CURLOPT_HTTPHEADER, array("Content-Type: application/json"));
+            curl_setopt($ch,CURLOPT_HTTPHEADER, array("Content-Type: application/json", "Accept: application/json"));
         }
 		$response = curl_exec($ch);
         $error = curl_error($ch);
@@ -198,6 +217,12 @@ class Shorteen {
         {
             case 'googl':
                 $shorturl = $rawdata->id;
+                break;
+            case 'cloud-app':
+                if (isset($rawdata))
+                {
+                    $shorturl = $rawdata->url;
+                }
                 break;
             default:
                 $shorturl = $response;
