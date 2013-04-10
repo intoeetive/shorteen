@@ -28,11 +28,11 @@ if ( ! defined('BASEPATH'))
 class Shorteen_mcp {
 
     var $version = '0.4';
-    
+
     var $settings = array();
-    
+
     var $docs_url = "http://www.intoeetive.com/docs/shorteen.html";
-    
+
     public $providers = array(
                         'googl'=>array(
                             'api_key'
@@ -47,66 +47,71 @@ class Shorteen_mcp {
                         'lessn-more'=>array(
                             'api_key',
                             'install_url'
+                        ),
+                        'cloud-app'=>array(
+                            'email',
+                            'password'
                         )
                     );
-    
-    function __construct() { 
-        // Make a local reference to the ExpressionEngine super object 
-        $this->EE =& get_instance(); 
+
+    function __construct() {
+        // Make a local reference to the ExpressionEngine super object
+        $this->EE =& get_instance();
         $query = $this->EE->db->query("SELECT settings FROM exp_modules WHERE module_name='Shorteen' LIMIT 1");
-        $this->settings = unserialize($query->row('settings')); 
-    } 
-    
+        $this->settings = unserialize($query->row('settings'));
+    }
+
     function index()
     {
         $this->EE->load->helper('form');
-    	$this->EE->load->library('table');  
+    	$this->EE->load->library('table');
         $this->EE->load->library('javascript');
-        
+
         $outputjs = "
-            $(\".editAccordion\").css(\"borderTop\", $(\".editAccordion\").css(\"borderBottom\")); 
+            $(\".editAccordion\").css(\"borderTop\", $(\".editAccordion\").css(\"borderBottom\"));
             $(\".editAccordion h3\").click(function() {
-                if ($(this).hasClass(\"collapsed\")) { 
-                    $(this).siblings().slideDown(\"fast\"); 
-                    $(this).removeClass(\"collapsed\").parent().removeClass(\"collapsed\"); 
-                } else { 
-                    $(this).siblings().slideUp(\"fast\"); 
-                    $(this).addClass(\"collapsed\").parent().addClass(\"collapsed\"); 
+                if ($(this).hasClass(\"collapsed\")) {
+                    $(this).siblings().slideDown(\"fast\");
+                    $(this).removeClass(\"collapsed\").parent().removeClass(\"collapsed\");
+                } else {
+                    $(this).siblings().slideUp(\"fast\");
+                    $(this).addClass(\"collapsed\").parent().addClass(\"collapsed\");
                 }
-            }); 
-        ";    
-        
+            });
+        ";
+
         $providers_view = '';
         $providers = array();
-        
+
         foreach ($this->providers as $provider_name=>$provider_fields)
         {
             $data['name'] = lang($provider_name);
             $data['fields'] = array();
-            
+
             foreach ($provider_fields as $field)
             {
+                $field_type = ($field == 'password' ? 'password' : 'input');
                 $data['fields'][] = array(
-                                        'label'=>lang($field),
-                                        'field'=>form_input($field."[$provider_name]", (isset($this->settings[$provider_name][$field])?$this->settings[$provider_name][$field]:''), 'style="width: 80%"')
-                                    );
+                    'label'=>lang($field),
+                    'field'=>call_user_func('form_' . $field_type, $field."[$provider_name]", (isset($this->settings[$provider_name][$field])?$this->settings[$provider_name][$field]:''), 'style="width: 80%"')
+                );
             }
-            
+
             $providers_view .= $this->EE->load->view('provider', $data, TRUE);
         }
-        
+
         $vars = array();
         $vars['providers'] = $providers_view;
-        
+
         $this->EE->javascript->output(str_replace(array("\n", "\t"), '', $outputjs));
-        
+
         $this->EE->cp->set_variable('cp_page_title', lang('shorteen_module_name'));
-        
+
     	return $this->EE->load->view('settings', $vars, TRUE);
-        
+
     }
 
-    
+
     function save_settings()
     {
 
@@ -119,16 +124,16 @@ class Shorteen_mcp {
                 $settings[$provider_name][$field] = $_POST["$field"]["$provider_name"];
             }
         }
-        
+
         $this->EE->db->where('module_name', 'Shorteen');
         $this->EE->db->update('modules', array('settings' => serialize($settings)));
-        
-        $this->EE->session->set_flashdata('message_success', $this->EE->lang->line('updated'));        
+
+        $this->EE->session->set_flashdata('message_success', $this->EE->lang->line('updated'));
         $this->EE->functions->redirect(BASE.AMP.'C=addons_modules');
-        
-    }    
-   
-    
+
+    }
+
+
 
 }
 /* END */

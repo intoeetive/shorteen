@@ -29,6 +29,12 @@ $lang = array(
 "lessn-more" =>
 "Lessn More",
 
+"cloud-app" =>
+"CloudApp",
+
+"email" =>
+"Email",
+
 "login"=>
 "Login",
 
