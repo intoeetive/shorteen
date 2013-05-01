@@ -97,7 +97,10 @@ class Shorteen {
             }
         }
 
+		// Set defaults
         $url = urlencode($url);
+        $auth_type = 'notdigest';
+        
         switch ($service)
         {
             case 'googl':
