@@ -23,11 +23,11 @@ if ( ! defined('BASEPATH'))
     exit('Invalid file request');
 }
 
-
+require_once PATH_THIRD . 'shorteen/config.php';
 
 class Shorteen_upd {
 
-    var $version = '0.4';
+    var $version = SHORTEEN_VER;
 
     function __construct() {
         // Make a local reference to the ExpressionEngine super object
@@ -89,6 +89,12 @@ class Shorteen_upd {
     }
 
     function update($current='') {
+	    // Return false if no update is needed
+        if (version_compare($current, $this->version) >= 0)
+        {
+            return FALSE;
+        }
+        
         if ($current < 0.2)
         {
             $this->EE->db->query("CREATE TABLE IF NOT EXISTS `exp_shorteen` (

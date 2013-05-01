@@ -24,7 +24,6 @@ if ( ! defined('BASEPATH'))
     exit('Invalid file request');
 }
 
-
 class Shorteen {
 
     var $return_data	= ''; 						// Bah!

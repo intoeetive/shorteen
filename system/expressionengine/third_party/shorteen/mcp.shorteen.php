@@ -23,15 +23,15 @@ if ( ! defined('BASEPATH'))
     exit('Invalid file request');
 }
 
-
+require_once PATH_THIRD . 'shorteen/config.php';
 
 class Shorteen_mcp {
 
-    var $version = '0.4';
+    var $version = SHORTEEN_VER;
 
     var $settings = array();
 
-    var $docs_url = "http://www.intoeetive.com/docs/shorteen.html";
+    var $docs_url = SHORTEEN_DOCS;
 
     public $providers = array(
                         'googl'=>array(
