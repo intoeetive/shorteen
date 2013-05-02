@@ -24,7 +24,6 @@ if ( ! defined('BASEPATH'))
     exit('Invalid file request');
 }
 
-
 class Shorteen {
 
     var $return_data	= ''; 						// Bah!
@@ -57,9 +56,14 @@ class Shorteen {
 				$url = preg_replace_callback("/".LD."\s*path=(.*?)".RD."/", array(&$this->EE->functions, 'create_url'), $url);
 			}
             if ($url=='') $url = $this->EE->functions->fetch_current_uri();
-        }
-        if ($this->EE->input->get('service')!='') $service = $this->EE->input->get('service');
-        if ($this->EE->input->get('url')!='') $url = urldecode($this->EE->input->get('url'));
+        } else { // this is an Action Request
+        	if (isset($this->settings['ee-action']['ee-password']) && trim($this->settings['ee-action']['ee-password']) != ""
+        		&& $this->settings['ee-action']['ee-password'] != $this->EE->input->get('password')) {
+        		return false; // Did not pass password security
+        	}
+	        if ($this->EE->input->get('service')!='') $service = $this->EE->input->get('service');
+    	    if ($this->EE->input->get('url')!='') $url = urldecode($this->EE->input->get('url'));
+    	}
         if ($service=='') $service='googl';
         if ($url=='') return false;
 
@@ -98,7 +102,10 @@ class Shorteen {
             }
         }
 
+		// Set defaults
         $url = urlencode($url);
+        $auth_type = 'notdigest';
+        
         switch ($service)
         {
             case 'googl':

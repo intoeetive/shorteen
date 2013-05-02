@@ -32,6 +32,12 @@ $lang = array(
 "cloud-app" =>
 "CloudApp",
 
+"ee-action" =>
+"Expression Engine Action",
+
+"ee-password" =>
+"Password for scripts using the EE action to generate short urls<br />Ex: ".ee()->config->config['site_url']."?ACT=".ee()->cp->fetch_action_id('Shorteen', 'process')."&password=___&url=___&service=bitly",
+
 "email" =>
 "Email",
 
