@@ -51,7 +51,10 @@ class Shorteen_mcp {
                         'cloud-app'=>array(
                             'email',
                             'password'
-                        )
+                        ),
+                        'ee-action' => array(
+                        	'ee-password'
+                        ),
                     );
 
     function __construct() {
