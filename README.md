@@ -26,6 +26,7 @@ If service is not available or some data are missing in settings, the module wil
 
 ## Settings
 Some shortening services are available openly for everyone, and some require providing API key and/or other data. You need to provide those in module settings.
+"Shorteen secret" is used to password-protect shortening that is made by passing URL in query string.
 
 ### goo.gl
 To acquire an API key, visit the [APIs Console](https://code.google.com/apis/console). In the Services pane, activate the Google URL Shortener API; if the Terms of Service appear, read and accept them.

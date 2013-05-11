@@ -23,15 +23,15 @@ if ( ! defined('BASEPATH'))
     exit('Invalid file request');
 }
 
-
+require_once PATH_THIRD.'shorteen/config.php';
 
 class Shorteen_mcp {
 
-    var $version = '0.4';
+    var $version = SHORTEEN_ADDON_VERSION;
 
     var $settings = array();
 
-    var $docs_url = "http://www.intoeetive.com/docs/shorteen.html";
+    var $docs_url = "https://github.com/intoeetive/shorteen/blob/master/README.md";
 
     public $providers = array(
                         'googl'=>array(
@@ -102,10 +102,19 @@ class Shorteen_mcp {
 
         $vars = array();
         $vars['providers'] = $providers_view;
+        $vars['shorteen_secret'] = form_input('shorteen_secret', (isset($this->settings['shorteen_secret'])?$this->settings['shorteen_secret']:''), 'style="width: 80%"');
 
         $this->EE->javascript->output(str_replace(array("\n", "\t"), '', $outputjs));
-
-        $this->EE->cp->set_variable('cp_page_title', lang('shorteen_module_name'));
+        
+        if ($this->EE->config->item('app_version')>=260)
+        {
+        	$this->EE->view->cp_page_title = lang('shorteen_module_name');
+        }
+        else
+        {
+        	$this->EE->cp->set_variable('cp_page_title', lang('shorteen_module_name'));
+        }
+        
 
     	return $this->EE->load->view('settings', $vars, TRUE);
 
@@ -124,6 +133,8 @@ class Shorteen_mcp {
                 $settings[$provider_name][$field] = $_POST["$field"]["$provider_name"];
             }
         }
+        
+        $settings['shorteen_secret'] = $this->EE->input->post('shorteen_secret');
 
         $this->EE->db->where('module_name', 'Shorteen');
         $this->EE->db->update('modules', array('settings' => serialize($settings)));

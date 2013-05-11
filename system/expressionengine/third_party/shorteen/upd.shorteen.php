@@ -23,11 +23,11 @@ if ( ! defined('BASEPATH'))
     exit('Invalid file request');
 }
 
-
+require_once PATH_THIRD.'shorteen/config.php';
 
 class Shorteen_upd {
 
-    var $version = '0.4';
+    var $version = SHORTEEN_ADDON_VERSION;
 
     function __construct() {
         // Make a local reference to the ExpressionEngine super object

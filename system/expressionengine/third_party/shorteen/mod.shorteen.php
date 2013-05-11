@@ -47,7 +47,8 @@ class Shorteen {
 
     function process($service='', $url='', $embedded=false)
     {
-        if (isset($this->EE->TMPL))
+        $shorteen_secret = (isset($this->settings['shorteen_secret']))?$this->settings['shorteen_secret']:'';
+		if (isset($this->EE->TMPL))
         {
             $service = $this->EE->TMPL->fetch_param('service');
             $url = $this->EE->TMPL->parse_globals($this->EE->TMPL->fetch_param('url'));
@@ -59,7 +60,14 @@ class Shorteen {
             if ($url=='') $url = $this->EE->functions->fetch_current_uri();
         }
         if ($this->EE->input->get('service')!='') $service = $this->EE->input->get('service');
-        if ($this->EE->input->get('url')!='') $url = urldecode($this->EE->input->get('url'));
+        if ($this->EE->input->get('url')!='') 
+		{
+			if ($shorteen_secret!='' && $this->EE->input->get('secret')!=$shorteen_secret)
+			{
+				return false;
+			}
+			$url = urldecode($this->EE->input->get('url'));
+		}
         if ($service=='') $service='googl';
         if ($url=='') return false;
 
@@ -99,6 +107,7 @@ class Shorteen {
         }
 
         $url = urlencode($url);
+        $auth_type = '';
         switch ($service)
         {
             case 'googl':
@@ -173,7 +182,10 @@ class Shorteen {
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        if (ini_get('open_basedir') == '' && ini_get('safe_mode' == 'Off'))
+        {
+            curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+        }
         curl_setopt($ch, CURLOPT_COOKIEFILE, '/dev/null');
         if ($auth_type=='digest')
         {

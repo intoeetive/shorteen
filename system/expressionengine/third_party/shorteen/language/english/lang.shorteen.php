@@ -56,6 +56,9 @@ $lang = array(
 'access_token' =>
 'Access token',
 
+'shorteen_secret' =>
+'Shorteen secret',
+
 /* END */
 ''=>''
 );
