@@ -236,6 +236,9 @@ class Shorteen {
                     $shorturl = trim($rawdata->url);
                 }
                 break;
+            case 'bitly':
+                $shorturl = preg_replace('/\r|\n/', '', $response);
+                break;
             default:
                 $shorturl = trim($response);
                 break;
